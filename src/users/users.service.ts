@@ -14,32 +14,36 @@ import { InjectRepository } from '@nestjs/typeorm';
 @Injectable()
 export class UsersService {
   constructor(
-    @InjectRepository(User) private readonly userRepository: Repository<User>,
+    @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
   async create(createUserDto: CreateUserDto): Promise<any> {
-    let user: User = this.userRepository.create(createUserDto);
+    let user: User = this.usersRepository.create(createUserDto);
 
     try {
-      user = await this.userRepository.save(user);
+      user = await this.usersRepository.save(user);
       const { password, ...rest } = user;
       return rest;
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new BadRequestException();
       }
+      console.log(error);
+
       throw new InternalServerErrorException();
     }
   }
 
   findAll(): Promise<User[]> {
-    return this.userRepository.find();
+    return this.usersRepository.find();
   }
 
   async findByUserOrMail(userOrMail: string): Promise<User> {
     try {
-      return await this.userRepository.findOneOrFail({
-        where: [{ username: userOrMail, email: userOrMail }],
+      const user = await this.usersRepository.findOneOrFail({
+        where: [{ username: userOrMail }, { email: userOrMail }],
       });
+
+      return user;
     } catch (error) {
       throw new NotFoundException();
     }
@@ -47,7 +51,7 @@ export class UsersService {
 
   async findOne(id: number): Promise<User> {
     try {
-      return await this.userRepository.findOneOrFail(id);
+      return await this.usersRepository.findOneOrFail(id);
     } catch (error) {
       throw new NotFoundException();
     }
@@ -56,11 +60,11 @@ export class UsersService {
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user: User = await this.findOne(id);
     const newUser: User = { ...user, ...updateUserDto };
-    return this.userRepository.save(newUser);
+    return this.usersRepository.save(newUser);
   }
 
   async remove(id: number): Promise<User> {
     const user: User = await this.findOne(id);
-    return this.userRepository.remove(user);
+    return this.usersRepository.remove(user);
   }
 }
