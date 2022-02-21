@@ -31,11 +31,11 @@ export class AuthenticationController {
   @Post('login')
   login(
     @Req() req: RequestWithUser,
-    @Res() res: Response,
-  ): Response<RequestWithUser> {
+    @Res({ passthrough: true }) res: Response,
+  ): User {
     const cookie = this.authenticationService.login(req.user);
     res.setHeader('Set-Cookie', cookie);
-    return res.send(req.user);
+    return req.user;
   }
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)

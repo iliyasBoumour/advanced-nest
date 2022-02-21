@@ -8,4 +8,6 @@ export class Post {
   title: string;
   @Column('text')
   content: string;
+  @Column({ nullable: true })
+  image?: string;
 }
