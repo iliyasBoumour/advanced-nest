@@ -1,3 +1,4 @@
+import { User } from './../../users/entities/user.entity';
 import { Strategy } from 'passport-local';
 import { PassportStrategy } from '@nestjs/passport';
 import { Injectable } from '@nestjs/common';
@@ -12,7 +13,7 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
     // {usernameField: 'email',} as param of super
   }
   // For every strategy, Passport calls the validate function using a set of parameters specific for a particular strategy. For the local strategy, Passport needs a method with a username and a password.
-  async validate(userMail: string, password: string): Promise<any> {
+  async validate(userMail: string, password: string): Promise<User> {
     return await this.authService.validateUser(userMail, password);
   }
 }

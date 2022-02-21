@@ -15,20 +15,24 @@ import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import RequestWithUser from './interfaces/requestWithUser.interface';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthenticationController {
   constructor(private readonly authenticationService: AuthenticationService) {}
 
   @Post('register')
-  create(@Body() createUserDto: CreateUserDto) {
+  create(@Body() createUserDto: CreateUserDto): Promise<User> {
     return this.authenticationService.register(createUserDto);
   }
 
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @Post('login')
-  login(@Req() req: RequestWithUser, @Res() res: Response) {
+  login(
+    @Req() req: RequestWithUser,
+    @Res() res: Response,
+  ): Response<RequestWithUser> {
     const cookie = this.authenticationService.login(req.user);
     res.setHeader('Set-Cookie', cookie);
     return res.send(req.user);
@@ -36,7 +40,7 @@ export class AuthenticationController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response) {
+  logout(@Res({ passthrough: true }) res: Response): void {
     const cookie = this.authenticationService.logout();
     res.setHeader('Set-Cookie', cookie);
   }

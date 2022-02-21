@@ -12,23 +12,19 @@ import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
+// @UseInterceptors(ClassSerializerInterceptor)
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
   ) {}
-  async create(createUserDto: CreateUserDto): Promise<any> {
-    let user: User = this.usersRepository.create(createUserDto);
-
+  async create(createUserDto: CreateUserDto): Promise<User> {
+    const user: User = this.usersRepository.create(createUserDto);
     try {
-      user = await this.usersRepository.save(user);
-      const { password, ...rest } = user;
-      return rest;
+      return await this.usersRepository.save(user);
     } catch (error) {
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new BadRequestException();
       }
-      console.log(error);
-
       throw new InternalServerErrorException();
     }
   }
@@ -37,24 +33,19 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findByUserOrMail(userOrMail: string): Promise<any> {
+  async findByUserOrMail(userOrMail: string): Promise<User> {
     try {
-      const user = await this.usersRepository.findOneOrFail({
+      return await this.usersRepository.findOneOrFail({
         where: [{ username: userOrMail }, { email: userOrMail }],
       });
-      const { password, ...rest } = user;
-
-      return rest;
     } catch (error) {
       throw new NotFoundException();
     }
   }
 
-  async findOne(id: number): Promise<any> {
+  async findOne(id: number): Promise<User> {
     try {
-      const user = await this.usersRepository.findOneOrFail(id);
-      const { password, ...rest } = user;
-      return rest;
+      return await this.usersRepository.findOneOrFail(id);
     } catch (error) {
       throw new NotFoundException();
     }
@@ -66,8 +57,8 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
-  async remove(id: number): Promise<User> {
+  async remove(id: number): Promise<void> {
     const user: User = await this.findOne(id);
-    return this.usersRepository.remove(user);
+    await this.usersRepository.remove(user);
   }
 }

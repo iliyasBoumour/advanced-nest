@@ -14,13 +14,13 @@ export class AuthenticationService {
     private readonly configService: ConfigService,
   ) {}
 
-  async register(createUserDto: CreateUserDto) {
+  async register(createUserDto: CreateUserDto): Promise<User> {
     const shadow: string = await bcrypt.hash(createUserDto.password, 10);
     const user: CreateUserDto = { ...createUserDto, password: shadow };
     return this.usersService.create(user);
   }
 
-  async validateUser(userMail, password): Promise<any> {
+  async validateUser(userMail, password): Promise<User> {
     const user: User = await this.usersService.findByUserOrMail(userMail);
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new BadRequestException();
