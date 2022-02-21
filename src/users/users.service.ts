@@ -49,9 +49,11 @@ export class UsersService {
     }
   }
 
-  async findOne(id: number): Promise<User> {
+  async findOne(id: number): Promise<any> {
     try {
-      return await this.usersRepository.findOneOrFail(id);
+      const user = await this.usersRepository.findOneOrFail(id);
+      const { password, ...rest } = user;
+      return rest;
     } catch (error) {
       throw new NotFoundException();
     }

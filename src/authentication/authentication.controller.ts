@@ -14,6 +14,7 @@ import { Response } from 'express';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import RequestWithUser from './interfaces/requestWithUser.interface';
+import { JwtAuthGuard } from './guards/jwt-auth.guard';
 
 @Controller('auth')
 export class AuthenticationController {
@@ -32,9 +33,9 @@ export class AuthenticationController {
     res.setHeader('Set-Cookie', cookie);
     return res.send(req.user);
   }
-  // @UseGuards(JwtAuthGuard)
-  // @Get('test')
-  // protected() {
-  //   return 'req.user';
-  // }
+  @UseGuards(JwtAuthGuard)
+  @Get('test')
+  protected(@Req() req) {
+    return req.user;
+  }
 }
