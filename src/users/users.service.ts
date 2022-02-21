@@ -37,13 +37,14 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async findByUserOrMail(userOrMail: string): Promise<User> {
+  async findByUserOrMail(userOrMail: string): Promise<any> {
     try {
       const user = await this.usersRepository.findOneOrFail({
         where: [{ username: userOrMail }, { email: userOrMail }],
       });
+      const { password, ...rest } = user;
 
-      return user;
+      return rest;
     } catch (error) {
       throw new NotFoundException();
     }

@@ -25,8 +25,8 @@ export class AuthenticationController {
     return this.authenticationService.register(createUserDto);
   }
 
-  @HttpCode(200)
   @UseGuards(LocalAuthGuard)
+  @HttpCode(200)
   @Post('login')
   login(@Req() req: RequestWithUser, @Res() res: Response) {
     const cookie = this.authenticationService.login(req.user);
@@ -34,8 +34,15 @@ export class AuthenticationController {
     return res.send(req.user);
   }
   @UseGuards(JwtAuthGuard)
+  @HttpCode(200)
+  @Post('logout')
+  logout(@Res({ passthrough: true }) res: Response) {
+    const cookie = this.authenticationService.logout();
+    res.setHeader('Set-Cookie', cookie);
+  }
+  @UseGuards(JwtAuthGuard)
   @Get('test')
-  protected(@Req() req) {
-    return req.user;
+  test() {
+    return { msg: 'we' };
   }
 }

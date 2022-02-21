@@ -25,8 +25,7 @@ export class AuthenticationService {
     if (!user || !(await bcrypt.compare(password, user.password))) {
       throw new BadRequestException();
     }
-    const { password: pwd, ...rest } = user;
-    return rest;
+    return user;
   }
   // add token payload here
   login({ id }: User): string {
@@ -34,5 +33,8 @@ export class AuthenticationService {
     return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
     )}`;
+  }
+  logout(): string {
+    return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }
 }
