@@ -1,43 +1,41 @@
-import { Post } from './entities/post.entity';
 import { Injectable, NotFoundException } from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Repository } from 'typeorm';
+import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 
 @Injectable()
 export class PostsService {
-  private posts: Post[] = [];
-  private lid = 0;
-  create(createPostDto: CreatePostDto) {
-    const newPost = { ...createPostDto, id: ++this.lid };
-    this.posts.push(newPost);
-    return newPost;
+  constructor(
+    @InjectRepository(Post)
+    private readonly postsRepository: Repository<Post>,
+  ) {}
+  create(createPostDto: CreatePostDto): Promise<Post> {
+    const newPost: Post = this.postsRepository.create(createPostDto); // const newPost=new Post(args)
+    return this.postsRepository.save(newPost);
   }
 
-  findAll() {
-    return this.posts;
+  findAll(): Promise<Post[]> {
+    return this.postsRepository.find();
   }
 
-  findOne(id: number) {
-    const post = this.posts.find((post) => post.id === id);
-    if (!post) {
+  async findOne(id: number): Promise<Post> {
+    try {
+      return await this.postsRepository.findOneOrFail(id);
+    } catch (error) {
       throw new NotFoundException();
     }
-    return post;
   }
 
-  update(id: number, updatePostDto: UpdatePostDto) {
-    const postIndex = this.posts.findIndex((post) => post.id === id);
-    if (postIndex == -1) {
-      throw new NotFoundException();
-    }
-    const newPost = (this.posts[postIndex] = {
-      ...this.posts[postIndex],
-      ...updatePostDto,
-    });
-    return newPost;
+  async update(id: number, updatePostDto: UpdatePostDto): Promise<Post> {
+    const post: Post = await this.findOne(id);
+    const newPost: Post = { ...post, ...updatePostDto };
+    return this.postsRepository.save(newPost);
   }
 
-  remove(id: number) {
-    this.posts = this.posts.filter((post) => post.id !== id);
+  async remove(id: number): Promise<void> {
+    const post = await this.findOne(id);
+    await this.postsRepository.remove(post);
   }
 }
