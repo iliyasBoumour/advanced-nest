@@ -1,3 +1,4 @@
+import { Post } from './../../posts/entities/post.entity';
 import { Contact } from './contact.entity';
 import {
   Column,
@@ -5,6 +6,7 @@ import {
   PrimaryGeneratedColumn,
   OneToOne,
   JoinColumn,
+  OneToMany,
 } from 'typeorm';
 import { Exclude } from 'class-transformer';
 
@@ -20,10 +22,12 @@ export class User {
   @Exclude()
   readonly password: string;
   @OneToOne(() => Contact, {
-    eager: true,
+    // eager: true,
     // Thanks to that, we can save an address while saving a user. by sending {"username":"iiyas"...,"contact":{"phone": 878678...}}
     cascade: true,
   })
   @JoinColumn()
   contact?: Contact;
+  @OneToMany(() => Post, (post: Post) => post.author)
+  posts: Post[];
 }

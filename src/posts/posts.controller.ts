@@ -1,3 +1,4 @@
+import { JwtAuthGuard } from './../authentication/guards/jwt-auth.guard';
 import {
   Controller,
   Get,
@@ -8,20 +9,27 @@ import {
   Delete,
   HttpCode,
   HttpStatus,
+  Req,
+  UseGuards,
 } from '@nestjs/common';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from './entities/post.entity';
 import { NumericParam } from '../shared/entities/numparam.entity';
+import RequestWithUser from '../authentication/interfaces/requestWithUser.interface';
 
 @Controller('posts')
 export class PostsController {
   constructor(private readonly postsService: PostsService) {}
 
+  @UseGuards(JwtAuthGuard)
   @Post()
-  create(@Body() createPostDto: CreatePostDto): Promise<PostModel> {
-    return this.postsService.create(createPostDto);
+  create(
+    @Body() createPostDto: CreatePostDto,
+    @Req() { user }: RequestWithUser,
+  ): Promise<PostModel> {
+    return this.postsService.create(createPostDto, user);
   }
   @Get()
   findAll(): Promise<PostModel[]> {

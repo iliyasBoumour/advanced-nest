@@ -4,6 +4,7 @@ import { Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
+import { User } from '../users/entities/user.entity';
 
 @Injectable()
 export class PostsService {
@@ -11,8 +12,12 @@ export class PostsService {
     @InjectRepository(Post)
     private readonly postsRepository: Repository<Post>,
   ) {}
-  create(createPostDto: CreatePostDto): Promise<Post> {
-    const newPost: Post = this.postsRepository.create(createPostDto); // const newPost=new Post(args)
+  create(createPostDto: CreatePostDto, user: User): Promise<Post> {
+    const newPost: Post = this.postsRepository.create({
+      ...createPostDto,
+      author: user,
+    }); // const newPost=new Post(args)
+
     return this.postsRepository.save(newPost);
   }
 
