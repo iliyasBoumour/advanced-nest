@@ -5,13 +5,11 @@ import {
   Body,
   Controller,
   Req,
-  Res,
   Post,
   UseGuards,
   HttpCode,
   Get,
 } from '@nestjs/common';
-import { Response } from 'express';
 import { CreateUserDto } from '../users/dto/create-user.dto';
 import { LocalAuthGuard } from './guards/local-auth.guard';
 import RequestWithUser from './interfaces/requestWithUser.interface';
