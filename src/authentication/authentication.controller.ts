@@ -47,9 +47,10 @@ export class AuthenticationController {
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('logout')
-  logout(@Res({ passthrough: true }) res: Response): void {
+  async logout(@Req() req: RequestWithUser): Promise<void> {
+    await this.usersService.removeRefreshToken(req.user.id);
     const cookie = this.authenticationService.logout();
-    res.setHeader('Set-Cookie', cookie);
+    req.res.setHeader('Set-Cookie', cookie);
   }
 
   @UseGuards(RefreshGuard)

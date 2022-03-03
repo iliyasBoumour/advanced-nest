@@ -66,6 +66,12 @@ export class UsersService {
     return this.usersRepository.save(newUser);
   }
 
+  async removeRefreshToken(id: number) {
+    const user: User = await this.findOne(id);
+    const newUser: User = { ...user, refreshToken: null };
+    return this.usersRepository.save(newUser);
+  }
+
   async remove(id: number): Promise<void> {
     const user: User = await this.findOne(id);
     await this.usersRepository.remove(user);
