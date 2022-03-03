@@ -1,4 +1,5 @@
-// import { JwtAuthGuard } from './guards/jwt-auth.guard';
+import { UsersService } from './../users/users.service';
+import { RefreshGuard } from './guards/refresh.guard';
 import { AuthenticationService } from './authentication.service';
 import {
   Body,
@@ -19,7 +20,10 @@ import { User } from '../users/entities/user.entity';
 
 @Controller('auth')
 export class AuthenticationController {
-  constructor(private readonly authenticationService: AuthenticationService) {}
+  constructor(
+    private readonly authenticationService: AuthenticationService,
+    private readonly usersService: UsersService,
+  ) {}
 
   @Post('register')
   create(@Body() createUserDto: CreateUserDto): Promise<User> {
@@ -29,14 +33,17 @@ export class AuthenticationController {
   @UseGuards(LocalAuthGuard)
   @HttpCode(200)
   @Post('login')
-  login(
-    @Req() req: RequestWithUser,
-    @Res({ passthrough: true }) res: Response,
-  ): User {
-    const cookie = this.authenticationService.login(req.user);
-    res.setHeader('Set-Cookie', cookie);
+  async login(@Req() req: RequestWithUser): Promise<User> {
+    const { id } = req.user;
+    const access_cookie = this.authenticationService.getAccessCookie(id);
+    const { refresh_cookie, refresh_token: refreshToken } =
+      this.authenticationService.getRefreshCookie(id);
+    await this.usersService.update(id, { refreshToken });
+
+    req.res.setHeader('Set-Cookie', [access_cookie, refresh_cookie]);
     return req.user;
   }
+
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
   @Post('logout')
@@ -44,6 +51,16 @@ export class AuthenticationController {
     const cookie = this.authenticationService.logout();
     res.setHeader('Set-Cookie', cookie);
   }
+
+  @UseGuards(RefreshGuard)
+  @Get('refresh')
+  refresh(@Req() req: RequestWithUser): void {
+    const access_cookie = this.authenticationService.getAccessCookie(
+      req.user.id,
+    );
+    req.res.setHeader('Set-Cookie', access_cookie);
+  }
+
   @UseGuards(JwtAuthGuard)
   @Get('test')
   test() {

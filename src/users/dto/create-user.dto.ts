@@ -5,6 +5,8 @@ export class CreateUserDto {
   username: string;
   @IsEmail()
   email: string;
+  @IsString()
+  refreshToken: string;
   @MinLength(7)
   readonly password: string;
 }

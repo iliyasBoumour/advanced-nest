@@ -10,6 +10,7 @@ import {
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
+import * as bcrypt from 'bcrypt';
 
 @Injectable()
 // @UseInterceptors(ClassSerializerInterceptor)
@@ -22,6 +23,8 @@ export class UsersService {
     try {
       return await this.usersRepository.save(user);
     } catch (error) {
+      console.log(error);
+
       if (error?.code === PostgresErrorCode.UniqueViolation) {
         throw new BadRequestException();
       }
@@ -53,6 +56,12 @@ export class UsersService {
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
     const user: User = await this.findOne(id);
+    if (updateUserDto.refreshToken) {
+      updateUserDto.refreshToken = await bcrypt.hash(
+        updateUserDto.refreshToken,
+        10,
+      );
+    }
     const newUser: User = { ...user, ...updateUserDto };
     return this.usersRepository.save(newUser);
   }

@@ -1,4 +1,8 @@
-import { Injectable, BadRequestException } from '@nestjs/common';
+import {
+  Injectable,
+  BadRequestException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
@@ -27,13 +31,43 @@ export class AuthenticationService {
     }
     return user;
   }
-  // add token payload here
-  login({ id }: User): string {
-    const token = this.jwtService.sign({ id });
-    return `Authentication=${token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+
+  async validateRefreshToken(id: number, token: string): Promise<User> {
+    const user: User = await this.usersService.findOne(id);
+    console.log(user, token);
+    if (!user || !(await bcrypt.compare(token, user.refreshToken))) {
+      throw new UnauthorizedException();
+    }
+    return user;
+  }
+
+  getAccessCookie(id: number): string {
+    const access_token = this.jwtService.sign(
+      { id },
+      {
+        secret: this.configService.get('JWT_ACCESS_SECRET'),
+        expiresIn: `${this.configService.get('JWT_ACCESS_EXPIRATION_TIME')}s`,
+      },
+    );
+    return `Authentication=${access_token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
       'JWT_EXPIRATION_TIME',
     )}`;
   }
+
+  getRefreshCookie(id: number) {
+    const refresh_token = this.jwtService.sign(
+      { id },
+      {
+        secret: this.configService.get('JWT_REFRESH_SECRET'),
+        expiresIn: `${this.configService.get('JWT_REFRESH_EXPIRATION_TIME')}s`,
+      },
+    );
+    const refresh_cookie = `Refresh=${refresh_token}; HttpOnly; Path=/; Max-Age=${this.configService.get(
+      'JWT_EXPIRATION_TIME',
+    )}`;
+    return { refresh_cookie, refresh_token };
+  }
+
   logout(): string {
     return `Authentication=; HttpOnly; Path=/; Max-Age=0`;
   }

@@ -21,6 +21,8 @@ import { PropertiesModule } from './properties/properties.module';
         POSTGRES_DB: Joi.string().required(),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_ACCESS_EXPIRATION_TIME: Joi.string().required(),
+        JWT_REFRESH_SECRET: Joi.string().required(),
+        JWT_REFRESH_EXPIRATION_TIME: Joi.string().required(),
       }),
     }),
     DatabaseModule,
