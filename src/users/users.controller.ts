@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { NumericParam } from '../shared/entities/numparam.entity';
+import { NumericParam } from '../shared/types/numparam.entity';
 import { User } from './entities/user.entity';
 
 @Controller('users')

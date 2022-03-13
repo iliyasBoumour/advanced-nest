@@ -34,7 +34,6 @@ export class AuthenticationService {
 
   async validateRefreshToken(id: number, token: string): Promise<User> {
     const user: User = await this.usersService.findOne(id);
-    console.log(user, token);
     if (!user || !(await bcrypt.compare(token, user.refreshToken))) {
       throw new UnauthorizedException();
     }

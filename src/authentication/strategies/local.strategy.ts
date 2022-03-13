@@ -7,6 +7,7 @@ import { AuthenticationService } from '../authentication.service';
 @Injectable()
 // To configure a strategy, we need to provide a set of options specific to a particular strategy. In NestJS, we do it by extending the  PassportStrategy class.
 export class LocalStrategy extends PassportStrategy(Strategy) {
+  // this contructor verify that we have a username and password in the body request
   constructor(private authService: AuthenticationService) {
     super();
     // if we authenticate with email instead of username

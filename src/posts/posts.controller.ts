@@ -11,12 +11,14 @@ import {
   HttpStatus,
   Req,
   UseGuards,
+  Query,
 } from '@nestjs/common';
+import Pageable from '../shared/types/pageable.entity';
 import { PostsService } from './posts.service';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
 import { Post as PostModel } from './entities/post.entity';
-import { NumericParam } from '../shared/entities/numparam.entity';
+import { NumericParam } from '../shared/types/numparam.entity';
 import RequestWithUser from '../authentication/interfaces/requestWithUser.interface';
 
 @Controller('posts')
@@ -32,8 +34,10 @@ export class PostsController {
     return this.postsService.create(createPostDto, user);
   }
   @Get()
-  findAll(): Promise<PostModel[]> {
-    return this.postsService.findAll();
+  findAll(@Query() { search, limit, offset }: Pageable) {
+    console.log(limit, offset, search);
+
+    return this.postsService.findAll(limit, offset, search);
   }
 
   @Get(':id')

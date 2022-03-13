@@ -1,6 +1,6 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Like, Repository } from 'typeorm';
 import { Post } from './entities/post.entity';
 import { CreatePostDto } from './dto/create-post.dto';
 import { UpdatePostDto } from './dto/update-post.dto';
@@ -21,8 +21,22 @@ export class PostsService {
     return this.postsRepository.save(newPost);
   }
 
-  findAll(): Promise<Post[]> {
-    return this.postsRepository.find();
+  async findAll(limit = 10, offset = 0, search) {
+    if (search) {
+      console.log('search');
+
+      const [data, count] = await this.postsRepository.findAndCount({
+        where: { title: Like(`%${search}%`) },
+        skip: offset,
+        take: limit,
+      });
+      return { data, count };
+    }
+    const [data, count] = await this.postsRepository.findAndCount({
+      skip: offset,
+      take: limit,
+    });
+    return { data, count };
   }
 
   async findOne(id: number): Promise<Post> {

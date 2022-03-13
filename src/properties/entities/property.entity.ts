@@ -15,7 +15,11 @@ export class Property {
   name: string;
   @Column()
   type: string;
-  @OneToOne(() => Adress, { eager: true, cascade: true })
+  @OneToOne(() => Adress, {
+    eager: true,
+    // Tells TypeORM that if an adress is appended on a property, the adress should also be saved to the database.
+    cascade: true,
+  })
   @JoinColumn()
   adress: Adress;
 }
