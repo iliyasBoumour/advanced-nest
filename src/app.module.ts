@@ -7,6 +7,7 @@ import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { PropertiesModule } from './properties/properties.module';
+import { EmailModule } from './email/email.module';
 
 @Module({
   imports: [
@@ -29,6 +30,7 @@ import { PropertiesModule } from './properties/properties.module';
     UsersModule,
     AuthenticationModule,
     PropertiesModule,
+    EmailModule,
   ],
   controllers: [],
   providers: [],
