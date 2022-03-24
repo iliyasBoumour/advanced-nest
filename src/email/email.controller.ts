@@ -10,7 +10,8 @@ export class EmailController {
   @Post()
   @UseGuards(JwtAuthGuard)
   create(@Body() createEmailDto: CreateEmailDto) {
-    return this.emailService.send({ cmd: 'createEmail' }, createEmailDto);
+    // with event emit we cannot khow if the email was created or not and we cannot receive the answer from the server
+    return this.emailService.emit({ cmd: 'createEmail' }, createEmailDto);
   }
 
   @Get()
