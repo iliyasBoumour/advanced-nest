@@ -23,8 +23,6 @@ export class PostsService {
 
   async findAll(limit = 10, offset = 0, search) {
     if (search) {
-      console.log('search');
-
       const [data, count] = await this.postsRepository.findAndCount({
         where: { title: Like(`%${search}%`) },
         skip: offset,

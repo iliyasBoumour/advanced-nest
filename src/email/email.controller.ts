@@ -1,7 +1,19 @@
 import { JwtAuthGuard } from './../authentication/guards/jwt-auth.guard';
-import { Controller, Get, Post, Body, Inject, UseGuards } from '@nestjs/common';
+import {
+  Controller,
+  Get,
+  Post,
+  Body,
+  Inject,
+  UseGuards,
+  Delete,
+  HttpCode,
+  HttpStatus,
+  Param,
+} from '@nestjs/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { CreateEmailDto } from './dto/create-email.dto';
+import { NumericParam } from '../shared/types/numparam.entity';
 // this controller will talk with our microservice
 @Controller('emails')
 export class EmailController {
@@ -18,5 +30,11 @@ export class EmailController {
   @UseGuards(JwtAuthGuard)
   findAll() {
     return this.emailService.send({ cmd: 'findAllEmail' }, '');
+  }
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  @HttpCode(HttpStatus.NO_CONTENT)
+  remove(@Param() { id }: NumericParam) {
+    return this.emailService.emit({ cmd: 'removeEmail' }, id);
   }
 }
