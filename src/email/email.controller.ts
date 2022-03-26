@@ -6,35 +6,30 @@ import {
   Body,
   Inject,
   UseGuards,
-  Delete,
-  HttpCode,
-  HttpStatus,
-  Param,
+  OnModuleInit,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { CreateEmailDto } from './dto/create-email.dto';
-import { NumericParam } from '../shared/types/numparam.entity';
+import IEmailService from './emails.service.interface';
 // this controller will talk with our microservice
 @Controller('emails')
-export class EmailController {
-  constructor(@Inject('EMAIL_SERVICE') private emailService: ClientProxy) {}
+export class EmailController implements OnModuleInit {
+  private emailService: IEmailService;
+  constructor(@Inject('EMAIL_SERVICE') private client: ClientGrpc) {}
+
+  onModuleInit() {
+    this.emailService = this.client.getService<IEmailService>('EmailService');
+  }
 
   @Post()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   create(@Body() createEmailDto: CreateEmailDto) {
-    // with event emit we cannot khow if the email was created or not and we cannot receive the answer from the server
-    return this.emailService.emit({ cmd: 'createEmail' }, createEmailDto);
+    return this.emailService.addEmail(createEmailDto);
   }
 
   @Get()
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   findAll() {
-    return this.emailService.send({ cmd: 'findAllEmail' }, '');
-  }
-  @Delete(':id')
-  @UseGuards(JwtAuthGuard)
-  @HttpCode(HttpStatus.NO_CONTENT)
-  remove(@Param() { id }: NumericParam) {
-    return this.emailService.emit({ cmd: 'removeEmail' }, id);
+    return this.emailService.getAllEmails({});
   }
 }

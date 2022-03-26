@@ -1,0 +1,26 @@
+syntax = "proto3";
+package emails;
+service EmailService {
+// Even though we don’t need any parameters for the GetAllSubscribers method, we need to specify some message here – even if it is empty.
+  rpc GetAllEmails (GetAllEmailsParams) returns (EmailsResponse) {}
+  rpc AddEmail (CreateEmailDto) returns (Email) {}
+}
+
+message GetAllEmailsParams {}
+
+// Every field in a massage needs a unique number. The gRPC framework uses the numbers to identify the fields in the message binary format.
+// Changing the name of the field does not affect the protocol buffer encoding. Changing the number assigned to property does break the compatibility between applications
+message EmailsResponse {
+  repeated Email data = 1;
+}
+
+message Email {
+  int32 id = 1;
+  string object = 2;
+  string content = 3;
+}
+ 
+message CreateEmailDto {
+  string object = 1;
+  string content = 2;
+}

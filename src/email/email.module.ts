@@ -2,6 +2,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { Module } from '@nestjs/common';
 import { EmailController } from './email.controller';
 import { ClientProxyFactory, Transport } from '@nestjs/microservices';
+import { join } from 'path';
 
 @Module({
   imports: [ConfigModule],
@@ -11,19 +12,13 @@ import { ClientProxyFactory, Transport } from '@nestjs/microservices';
     {
       provide: 'EMAIL_SERVICE',
       useFactory: (configService: ConfigService) => {
-        const user = configService.get('RABBITMQ_USER');
-        const password = configService.get('RABBITMQ_PASSWORD');
-        const host = configService.get('RABBITMQ_HOST');
-        const queueName = configService.get('RABBITMQ_QUEUE_NAME');
-
         return ClientProxyFactory.create({
-          transport: Transport.RMQ,
+          transport: Transport.GRPC,
           options: {
-            urls: [`amqp://${user}:${password}@${host}`],
-            queue: queueName,
-            queueOptions: {
-              durable: true,
-            },
+            package: 'emails',
+            protoPath: join(__dirname, 'emails.proto'),
+            // this gRPC server can be accessed by the provided URL.
+            url: configService.get('GRPC_CONNECTION_URL'),
           },
         });
       },
