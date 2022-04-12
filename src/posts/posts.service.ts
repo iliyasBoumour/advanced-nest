@@ -21,16 +21,13 @@ export class PostsService {
     return this.postsRepository.save(newPost);
   }
 
-  async findAll(limit = 10, offset = 0, search) {
-    if (search) {
-      const [data, count] = await this.postsRepository.findAndCount({
-        where: { title: Like(`%${search}%`) },
-        skip: offset,
-        take: limit,
-      });
-      return { data, count };
-    }
+  async findAll(
+    limit = 10,
+    offset = 0,
+    search = '',
+  ): Promise<{ data: Post[]; count: number }> {
     const [data, count] = await this.postsRepository.findAndCount({
+      where: { title: Like(`%${search}%`) },
       skip: offset,
       take: limit,
     });

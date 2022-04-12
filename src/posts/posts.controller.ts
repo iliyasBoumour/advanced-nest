@@ -12,6 +12,8 @@ import {
   Req,
   UseGuards,
   Query,
+  CacheInterceptor,
+  UseInterceptors,
 } from '@nestjs/common';
 import Pageable from '../shared/types/pageable.entity';
 import { PostsService } from './posts.service';
@@ -34,6 +36,8 @@ export class PostsController {
     return this.postsService.create(createPostDto, user);
   }
   @Get()
+  // Automatically caching responses
+  @UseInterceptors(CacheInterceptor)
   findAll(@Query() { search, limit, offset }: Pageable) {
     console.log(limit, offset, search);
 
