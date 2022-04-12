@@ -9,7 +9,7 @@ import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { PropertiesModule } from './properties/properties.module';
 import { EmailModule } from './email/email.module';
-import { SendEmailModule } from './send-email/send-email.module';
+import { EmailScheduleModule } from './email-schedule/email-schedule.module';
 
 @Module({
   imports: [
@@ -37,7 +37,7 @@ import { SendEmailModule } from './send-email/send-email.module';
     AuthenticationModule,
     PropertiesModule,
     EmailModule,
-    SendEmailModule,
+    EmailScheduleModule,
   ],
   controllers: [],
   providers: [],

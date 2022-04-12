@@ -2,10 +2,11 @@ import { Injectable } from '@nestjs/common';
 import { createTransport } from 'nodemailer';
 import * as Mail from 'nodemailer/lib/mailer';
 import { ConfigService } from '@nestjs/config';
-import { Cron, Interval } from '@nestjs/schedule';
+
 @Injectable()
-export class SendEmailService {
+export default class EmailService {
   private nodemailerTransport: Mail;
+
   constructor(private readonly configService: ConfigService) {
     this.nodemailerTransport = createTransport({
       service: configService.get('EMAIL_SERVICE'),
@@ -15,15 +16,8 @@ export class SendEmailService {
       },
     });
   }
-  // @Cron('* * * * * *')
-  logEverySecond() {
-    console.log('Hello world!');
-  }
-  //   @Interval(60000)
-  logEveryMinute() {
-    console.log('Called every minute');
-  }
-  sendMail(options: Mail.Options): Promise<any> {
+
+  sendMail(options: Mail.Options) {
     return this.nodemailerTransport.sendMail(options);
   }
 }
