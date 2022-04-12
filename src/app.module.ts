@@ -2,16 +2,19 @@ import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
 // to validate our env variables
 import * as Joi from '@hapi/joi';
+import { ScheduleModule } from '@nestjs/schedule';
 import { PostsModule } from './posts/posts.module';
 import { DatabaseModule } from './database/database.module';
 import { UsersModule } from './users/users.module';
 import { AuthenticationModule } from './authentication/authentication.module';
 import { PropertiesModule } from './properties/properties.module';
 import { EmailModule } from './email/email.module';
+import { SendEmailModule } from './send-email/send-email.module';
 
 @Module({
   imports: [
     PostsModule,
+    ScheduleModule.forRoot(),
     ConfigModule.forRoot({
       validationSchema: Joi.object({
         PORT: Joi.number(),
@@ -34,6 +37,7 @@ import { EmailModule } from './email/email.module';
     AuthenticationModule,
     PropertiesModule,
     EmailModule,
+    SendEmailModule,
   ],
   controllers: [],
   providers: [],
